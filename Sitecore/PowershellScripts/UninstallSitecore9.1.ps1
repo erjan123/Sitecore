@@ -33,11 +33,11 @@ param(
 	[string]$CertPath = 'C:\Certificates',
 	
 	#Will only remove the SOLR cores
-	[string]$SolrPath = 'D:\solr\solr-7.2.1',
+	[string]$SolrPath = 'D:\solr\solr-7.2.1'
 	# Uncomment if you want to delete the entire Solr installation
-	[string]$SolrService = "solr-7.2.1",
-	[string]$SolrHost = "solr"
-
+	#[string]$SolrService = "solr-7.2.1",
+	#[string]$SolrHost = "solr",
+	#[string]$SolrPathAll = 'D:\solr\solr-7.2.1'
 )
 
 $XConnectWebsiteName = "$Prefix.xconnect"
@@ -268,7 +268,7 @@ if([bool]((get-content $HostFileLocation) -match $SolrHost)) {
 	}
 
 #Remove Solr files
-if (Test-Path $SolrPath) { 
+if (Test-Path $SolrPathAll) { 
      
 	Remove-Item -path $SolrPath\* -recurse 
 	Remove-Item -path $SolrPath 
