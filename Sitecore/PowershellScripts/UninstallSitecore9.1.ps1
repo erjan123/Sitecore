@@ -1,3 +1,5 @@
+#Declaimer: This is a destructive script, means, it deletes files, databases etc. 
+#Use it at your own risk.
 ############################################################################################
 #This script is created to remove Sitecore 9.1 instance from local machine.
 #This will not uninstall Solr but, it will remove Solr collections.
@@ -5,10 +7,9 @@
 #The script looks at the Prefix parameter and find out all instances and remove them.
 #Change the default values before using the script. Or, pass the values as parameters.
 
-#Usage: .\Remove-Sitecore9-Instance.ps1 -Prefix "xp0"
+#Usage: .\UninstallSitecore9.1.ps1 -Prefix "xp0"
 
-#Declaimer: This is a destructive script, means, it deletes files, databases etc. 
-#Use it at your own risk.
+
 
 #License: MIT
 ############################################################################################
