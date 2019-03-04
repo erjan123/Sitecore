@@ -31,7 +31,8 @@ param(
 	[string]$CertPath = 'C:\Certificates',
 	
 	#Will only remove the SOLR cores
-	[string]$SolrPath = 'D:\solr\solr-7.2.1'
+	[string]$SolrPath = 'D:\solr\solr-7.2.1',
+	[string]$SolrPathOnlyCores= $SolrPath 
 	# Uncomment if you want to delete the entire Solr installation
 	#[string]$SolrService = "solr-7.2.1",
 	#[string]$SolrHost = "solr",
@@ -227,6 +228,7 @@ if (Test-Path $CertPath) {
 	Write-host -foregroundcolor Red  $CertPath  " Does not exist" 
 }
 
+if (Test-Path $SolrPathOnlyCores) {   
 # Remove Solr Cores
 & "$SolrPath\bin\solr.cmd" delete -c ($Prefix + "_core_index")
 & "$SolrPath\bin\solr.cmd" delete -c ($Prefix + "_fxm_master_index")
@@ -242,22 +244,37 @@ if (Test-Path $CertPath) {
 & "$SolrPath\bin\solr.cmd" delete -c ($Prefix + "_xdb")
 & "$SolrPath\bin\solr.cmd" delete -c ($Prefix + "_xdb_rebuild")
 
-#Stop and remove Solr Windows Service
-Get-WmiObject -Class Win32_Service -Filter "Name='$SolrService'" | Remove-WmiObject
-
-$Service = Get-WmiObject -Class Win32_Service -Filter "Name='$SolrService'"
-if($Service) {
-	Get-Process -Name "solr-7.2.1" | Stop-Process -Force
-	Write-Host -foregroundcolor Green  "Deleting " $SolrService
-	$Service.StopService()
-	$Service.delete()
+Write-host -foregroundcolor Green $SolrPathOnlyCores "Solr Cores are Deleted" 
 }
 else {
-	Write-Host -foregroundcolor Red  $SolrService " service does not exists."
+	Write-host -foregroundcolor Red  $SolrPathOnlyCores  " Does not exist" 
 }
 
-# Remove solr host entry
-if([bool]((get-content $HostFileLocation) -match $SolrHost)) {
+#Remove Solr files
+if (Test-Path $SolrPathAll) { 
+	 
+	#Remove everthing under the solr-7.2.1 folder
+	Remove-Item -path $SolrPath\* -recurse 
+	Remove-Item -path $SolrPath 
+	Write-host -foregroundcolor Green $SolrPath " Deleted" 
+	[System.Threading.Thread]::Sleep(1500) 
+
+	#Stop and remove Solr Windows Service
+	Get-WmiObject -Class Win32_Service -Filter "Name='$SolrService'" | Remove-WmiObject
+
+	$Service = Get-WmiObject -Class Win32_Service -Filter "Name='$SolrService'"
+	if($Service) {
+		Get-Process -Name "solr-7.2.1" | Stop-Process -Force
+		Write-Host -foregroundcolor Green  "Deleting " $SolrService
+		$Service.StopService()
+		$Service.delete()
+	}
+	else {
+		Write-Host -foregroundcolor Red  $SolrService " service does not exists."
+	}
+
+	# Remove solr host entry
+	if([bool]((get-content $HostFileLocation) -match $SolrHost)) {
 	Write-Host -foregroundcolor Green  "Deleting hosts entires."
 	(get-content $HostFileLocation) -notmatch $SolrHost | Out-File $HostFileLocation
 	}
@@ -265,14 +282,6 @@ if([bool]((get-content $HostFileLocation) -match $SolrHost)) {
 		Write-Host -foregroundcolor Red $SolrHost "  hosts entire not found."
 	}
 
-#Remove Solr files
-if (Test-Path $SolrPathAll) { 
-     
-	Remove-Item -path $SolrPath\* -recurse 
-	Remove-Item -path $SolrPath 
-	Write-host -foregroundcolor Green $SolrPath " Deleted" 
-	[System.Threading.Thread]::Sleep(1500) 
-	 
 	} else { 
 	 
 	Write-host -foregroundcolor Red  $SolrPath  " Does not exist" 
