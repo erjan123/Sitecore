@@ -2,10 +2,10 @@ Param(
     $solrVersion = "7.2.1",
     $installFolder = "D:\solr",
     $solrPort = "8983",
-    $solrHost = "solr",
+    $solrHost = "solr721",
     $solrSSL = $true,
     $nssmVersion = "2.24",
-    $JREVersion = "1.8.0_202"
+    $JREVersion = "1.8.0_211"
 ) 
 
 $JREPath = "C:\Program Files\Java\jre$JREVersion" ## Note that if you're running 32bit java, you will need to change this path
