@@ -1,6 +1,6 @@
 Param(
     $solrVersion = "7.2.1",
-    $installFolder = "D:\solr",
+    $installFolder = "C:\solr",
     $solrPort = "8983",
     $solrHost = "solr721",
     $solrSSL = $true,
