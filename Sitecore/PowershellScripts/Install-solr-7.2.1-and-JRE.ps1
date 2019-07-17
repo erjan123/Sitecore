@@ -1,5 +1,5 @@
 # Downloads and installs the latest 64 bit JRE 
-#
+# 
 # Note: If 32 bit JRE is required change the title to -> title="Download Java software for Windows Online"
 # by removing "(64-bit)" from the title
 $URL=(Invoke-WebRequest -UseBasicParsing https://www.java.com/en/download/manual.jsp).Content | ForEach-Object{[regex]::matches($_, '(?:<a title="Download Java software for Windows \(64-bit\)" href=")(.*)(?:">)').Groups[1].Value}
