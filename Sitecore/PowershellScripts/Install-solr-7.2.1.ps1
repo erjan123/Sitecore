@@ -1,3 +1,5 @@
+
+
 Param(
     $solrVersion = "7.2.1",
     $installFolder = "C:\solr",
@@ -5,16 +7,27 @@ Param(
     $solrHost = "solr721",
     $solrSSL = $true,
     $nssmVersion = "2.24",
-    $JREVersion = "1.8.0_211" 
+    $JREVersion = "1.8.0_211",
+    $JREVersion64 = $true  # If 32 bit of JRE is installed set this to false
 ) 
 
-$JREPath = "C:\Program Files\Java\jre$JREVersion" ## Note that if you're running 32bit java, you will need to change this path
 $solrName = "solr-$solrVersion"
 $solrRoot = "$installFolder\$solrName"
 $nssmRoot = "$installFolder\nssm-$nssmVersion"
 $solrPackage = "https://archive.apache.org/dist/lucene/solr/$solrVersion/$solrName.zip"
 $nssmPackage = "https://nssm.cc/release/nssm-$nssmVersion.zip"
 $downloadFolder = "~\Downloads"
+
+
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+
+if($JREVersion64 -eq $true)
+{
+    $JREPath = "C:\Program Files\Java\jre$JREVersion" 
+}
+else {
+    $JREPath = "C:\Program Files (x86)\Java\jre$JREVersion"
+}
 
 ## Verify elevated
 ## https://superuser.com/questions/749243/detect-if-powershell-is-running-as-administrator
