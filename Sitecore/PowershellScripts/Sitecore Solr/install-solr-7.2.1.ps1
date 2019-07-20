@@ -1,5 +1,7 @@
-
-
+# Ercan Polat 
+# erjan123@yahoo.com
+# LinkedIn: https://www.linkedin.com/in/ercan-polat/
+#################################################################################################
 Param(
     $solrVersion = "7.2.1",
     $installFolder = "C:\solr",
