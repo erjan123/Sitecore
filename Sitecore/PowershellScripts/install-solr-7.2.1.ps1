@@ -9,7 +9,7 @@ Param(
     $solrHost = "solr721",
     $solrSSL = $true,
     $nssmVersion = "2.24",
-    $JREVersion = "1.8.0_221",
+    $JREVersion = "1.8.0_211",
     $JREVersion64 = $true  # If 32 bit of JRE is installed set this to false
 ) 
 
@@ -21,7 +21,7 @@ $nssmPackage = "https://nssm.cc/release/nssm-$nssmVersion.zip"
 $downloadFolder = "~\Downloads"
 
 
-#Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 
 if($JREVersion64 -eq $true)
 {
@@ -33,12 +33,13 @@ else {
 
 ## Verify elevated
 ## https://superuser.com/questions/749243/detect-if-powershell-is-running-as-administrator
+<#
 $elevated = [bool](([System.Security.Principal.WindowsIdentity]::GetCurrent()).groups -match "S-1-5-32-544")
 if($elevated -eq $false)
 {
     throw "In order to install services, please run this script elevated."
 }
-
+#>
 function downloadAndUnzipIfRequired
 {
     Param(
@@ -166,7 +167,7 @@ if(!($svc))
 }
 if($svc.Status -ne "Running")
 {
-    Write-Host "Starting Solr service" -ForegroundColor Green
+    Write-Host "Starting Solr service"
     Start-Service "$solrName"
 }
 
