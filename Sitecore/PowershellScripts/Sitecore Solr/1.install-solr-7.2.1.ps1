@@ -23,20 +23,21 @@ $downloadFolder = "~\Downloads"
 
 #Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 
-if($JREVersion64 -eq $true)
-{
-    $JREPath = "C:\Program Files\Java\jre$JREVersion" 
-}
-else {
-    $JREPath = "C:\Program Files (x86)\Java\jre$JREVersion"
-}
-
 ## Verify elevated
 ## https://superuser.com/questions/749243/detect-if-powershell-is-running-as-administrator
 $elevated = [bool](([System.Security.Principal.WindowsIdentity]::GetCurrent()).groups -match "S-1-5-32-544")
 if($elevated -eq $false)
 {
     throw "In order to install services, please run this script elevated."
+}
+
+
+if($JREVersion64 -eq $true)
+{
+    $JREPath = "C:\Program Files\Java\jre$JREVersion" 
+}
+else {
+    $JREPath = "C:\Program Files (x86)\Java\jre$JREVersion"
 }
 
 function downloadAndUnzipIfRequired
@@ -92,18 +93,6 @@ if($solrSSL -eq $false)
     }
 }
 
-# Ensure the solr host name is in your hosts file
-if($solrHost -ne "localhost")
-{
-    $hostFileName = "c:\\windows\system32\drivers\etc\hosts"
-    $hostFile = [System.Io.File]::ReadAllText($hostFileName)
-    if(!($hostFile -like "*$solrHost*"))
-    {
-        Write-Host "Updating host file"
-        "`r`n127.0.0.1`t$solrHost" | Add-Content $hostFileName
-    }
-}
-
 # if we're using HTTPS
 if($solrSSL -eq $true)
 {
@@ -153,6 +142,18 @@ if($solrSSL -eq $true)
         $newCfg = $newCfg | % { $_ -replace "REM set SOLR_SSL_TRUST_STORE_PASSWORD=secret", "set SOLR_SSL_TRUST_STORE_PASSWORD=secret" }
         $newCfg = $newCfg | % { $_ -replace "REM set SOLR_HOST=192.168.1.1", "set SOLR_HOST=$solrHost" }
         $newCfg | Set-Content "$solrRoot\bin\solr.in.cmd"
+    }
+}
+
+# Ensure the solr host name is in your hosts file
+if($solrHost -ne "localhost")
+{
+    $hostFileName = "c:\\windows\system32\drivers\etc\hosts"
+    $hostFile = [System.Io.File]::ReadAllText($hostFileName)
+    if(!($hostFile -like "*$solrHost*"))
+    {
+        Write-Host "Updating host file"
+        "`r`n127.0.0.1`t$solrHost" | Add-Content $hostFileName
     }
 }
 
