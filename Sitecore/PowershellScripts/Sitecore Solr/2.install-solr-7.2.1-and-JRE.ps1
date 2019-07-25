@@ -1,21 +1,8 @@
-# Downloads and installs the latest 64 bit JRE 
-# 
-# Note: If 32 bit JRE is required change the title to -> title="Download Java software for Windows Online"
-# by removing "(64-bit)" from the title
-$URL=(Invoke-WebRequest -UseBasicParsing https://www.java.com/en/download/manual.jsp).Content | ForEach-Object{[regex]::matches($_, '(?:<a title="Download Java software for Windows \(64-bit\)" href=")(.*)(?:">)').Groups[1].Value}
-Invoke-WebRequest -UseBasicParsing -OutFile jre8.exe $URL
-Start-Process .\jre8.exe '/s REBOOT=0 SPONSORS=0 AUTO_UPDATE=0' -wait
-
-#Write-Host $URL
-#Get the JRE folder name 
-$jre = Get-ChildItem -Path "C:\Program Files (x86)\Java" -name | Where-Object { -not $_.PsIsContainer } | Sort-Object LastWriteTime -Descending | Select-Object -first 1
-
-# This section is not required because the solr script does check for JAVA_HOME environmental variable
-# Write-Host $jre
-# Set JAVA_HOME environtment variables 
-# If JAVA_HOME is not set, SOLR will not start
-# $env:JAVA_HOME="C:\Program Files (x86)\Java\$jre"
-###################################################################################################################################
+# Ercan Polat 
+# erjan123@yahoo.com
+# LinkedIn: https://www.linkedin.com/in/ercan-polat/
+#################################################################################################
+# Enhanced PowerShell script that will download and install latest version of JRE
 
 # Solr Installation starts. 
 # Make sure to update the versions and folder path
@@ -26,16 +13,10 @@ Param(
     $solrHost = "solr721",
     $solrSSL = $true,
     $nssmVersion = "2.24",
-    $JREVersion = "1.8.0_211"
+	$downloadInstallJRE = $true,
+    $JREVersion64 = $true  
+	# $JREPath  = "C:\Program Files\Java\jre1.8.0_221"  #Note: If you set '$downloadInstallJRE' to false then you have to enable this parameter with a Valid JRE path.
 ) 
-
-$JREPath = "C:\Program Files\Java\jre$JREVersion" ## Note that if you're running 32bit java, you will need to change this path
-$solrName = "solr-$solrVersion"
-$solrRoot = "$installFolder\$solrName"
-$nssmRoot = "$installFolder\nssm-$nssmVersion"
-$solrPackage = "https://archive.apache.org/dist/lucene/solr/$solrVersion/$solrName.zip"
-$nssmPackage = "https://nssm.cc/release/nssm-$nssmVersion.zip"
-$downloadFolder = "~\Downloads"
 
 ## Verify elevated
 ## https://superuser.com/questions/749243/detect-if-powershell-is-running-as-administrator
@@ -44,6 +25,48 @@ if($elevated -eq $false)
 {
     throw "In order to install services, please run this script elevated."
 }
+
+if($downloadInstallJRE -eq $true)
+{
+	if($JREVersion64 -eq $true)
+	{
+		$URL=(Invoke-WebRequest -UseBasicParsing https://www.java.com/en/download/manual.jsp).Content | 	ForEach-Object{[regex]::matches($_, '(?:<a title="Download Java software for Windows \(64-bit\)" href=")(.*)(?:">)').Groups[1].Value}
+		$JREVersion = Get-ChildItem -Path "C:\Program Files\Java" -name | Where-Object { -not $_.PsIsContainer } | Sort-Object LastWriteTime -Descending | Select-Object -first 1
+		
+		Write-Host "$JREVersion"
+		$JREPath = "C:\Program Files\Java\$JREVersion"
+		Write-Host 	$JREPath
+		Write-Host "Downloading 64 bit of JRE"
+	}
+	else
+	{		
+		$URL=(Invoke-WebRequest -UseBasicParsing https://www.java.com/en/download/manual.jsp).Content | ForEach-Object{[regex]::matches($_, '(?:<a title="Download Java software for Windows Online" href=")(.*)(?:">)').Groups[1].Value}
+		$JREVersion = Get-ChildItem -Path "C:\Program Files (x86)\Java" -name | Where-Object { -not $_.PsIsContainer } | Sort-Object LastWriteTime -Descending | Select-Object -first 1
+
+		$JREPath = "C:\Program Files (x86)\Java\$JREVersion"
+
+		Write-Host "Downloading 32 bit of JRE"
+	}
+		Invoke-WebRequest -UseBasicParsing -OutFile jre8.exe $URL
+		Start-Process .\jre8.exe '/s REBOOT=0 SPONSORS=0 AUTO_UPDATE=0' -wait
+
+		Write-Host "JRE package URL " $URL
+}
+
+$jreVal = [Environment]::GetEnvironmentVariable("JAVA_HOME", [EnvironmentVariableTarget]::Machine)
+# Ensure Java environment variable
+if($jreVal -ne $JREPath)
+{
+    Write-Host "Setting JAVA_HOME environment variable"
+    [Environment]::SetEnvironmentVariable("JAVA_HOME", $JREPath, [EnvironmentVariableTarget]::Machine)
+}
+
+$solrName = "solr-$solrVersion"
+$solrRoot = "$installFolder\$solrName"
+$nssmRoot = "$installFolder\nssm-$nssmVersion"
+$solrPackage = "https://archive.apache.org/dist/lucene/solr/$solrVersion/$solrName.zip"
+$nssmPackage = "https://nssm.cc/release/nssm-$nssmVersion.zip"
+$downloadFolder = "~\Downloads"
 
 function downloadAndUnzipIfRequired
 {
@@ -66,6 +89,10 @@ function downloadAndUnzipIfRequired
         Write-Host "Extracting $toolName to $toolFolder..."
         Expand-Archive $toolZip -DestinationPath $installRoot
     }
+	else
+	{
+		Write-Host $toolName " does exist in Download folder. "
+	}
 }
 # download & extract the solr archive to the right folder
 $solrZip = "$downloadFolder\$solrName.zip"
@@ -74,14 +101,6 @@ downloadAndUnzipIfRequired "Solr" $solrRoot $solrZip $solrPackage $installFolder
 # download & extract the nssm archive to the right folder
 $nssmZip = "$downloadFolder\nssm-$nssmVersion.zip"
 downloadAndUnzipIfRequired "NSSM" $nssmRoot $nssmZip $nssmPackage $installFolder
-
-# Ensure Java environment variable
-$jreVal = [Environment]::GetEnvironmentVariable("JAVA_HOME", [EnvironmentVariableTarget]::Machine)
-if($jreVal -ne $JREPath)
-{
-    Write-Host "Setting JAVA_HOME environment variable"
-    [Environment]::SetEnvironmentVariable("JAVA_HOME", $JREPath, [EnvironmentVariableTarget]::Machine)
-}
 
 # if we're using HTTP
 if($solrSSL -eq $false)
@@ -95,18 +114,6 @@ if($solrSSL -eq $false)
         Rename-Item "$solrRoot\bin\solr.in.cmd" "$solrRoot\bin\solr.in.cmd.old"
         $newCfg = $newCfg | % { $_ -replace "REM set SOLR_HOST=192.168.1.1", "set SOLR_HOST=$solrHost" }
         $newCfg | Set-Content "$solrRoot\bin\solr.in.cmd"
-    }
-}
-
-# Ensure the solr host name is in your hosts file
-if($solrHost -ne "localhost")
-{
-    $hostFileName = "c:\\windows\system32\drivers\etc\hosts"
-    $hostFile = [System.Io.File]::ReadAllText($hostFileName)
-    if(!($hostFile -like "*$solrHost*"))
-    {
-        Write-Host "Updating host file"
-        "`r`n127.0.0.1`t$solrHost" | Add-Content $hostFileName
     }
 }
 
@@ -162,6 +169,18 @@ if($solrSSL -eq $true)
     }
 }
 
+# Ensure the solr host name is in your hosts file
+if($solrHost -ne "localhost")
+{
+    $hostFileName = "c:\\windows\system32\drivers\etc\hosts"
+    $hostFile = [System.Io.File]::ReadAllText($hostFileName)
+    if(!($hostFile -like "*$solrHost*"))
+    {
+        Write-Host "Updating host file"
+        "`r`n127.0.0.1`t$solrHost" | Add-Content $hostFileName
+    }
+}
+
 # install the service & runs
 $svc = Get-Service "$solrName" -ErrorAction SilentlyContinue
 if(!($svc))
@@ -183,3 +202,8 @@ if($solrSSL -eq $true)
     $protocol = "https"
 }
 Invoke-Expression "start $($protocol)://$($solrHost):$solrPort/solr/#/"
+Write-Host ""
+Write-Host "Verify Solr Admin page!"
+Write-Host ""
+Write-Host ""
+Write-Host "If you want to be happy then be happy!" -ForegroundColor Green

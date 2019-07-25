@@ -84,3 +84,7 @@ if ( Test-Path $solrExtractLocation )
 else { Write-Host "Solr location $solrExtractLocation already removed, good" -ForegroundColor Green }
 
 Write-Host "Completed uninstallation of Solr" -ForegroundColor Green
+
+Write-Host ""
+Write-Host ""
+Write-Host "If you want to be happy then be happy!" -ForegroundColor Green

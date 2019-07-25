@@ -178,3 +178,9 @@ if($solrSSL -eq $true)
     $protocol = "https"
 }
 Invoke-Expression "start $($protocol)://$($solrHost):$solrPort/solr/#/"
+
+Write-Host ""
+Write-Host "Verify Solr Admin page!"
+Write-Host ""
+Write-Host ""
+Write-Host "If you want to be happy then be happy!" -ForegroundColor Green
