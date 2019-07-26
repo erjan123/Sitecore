@@ -1,6 +1,7 @@
 # Ercan Polat 
 # erjan123@yahoo.com
 # LinkedIn: https://www.linkedin.com/in/ercan-polat/
+# 07/26/2019
 #################################################################################################
 Param(
     $solrVersion = "7.2.1",

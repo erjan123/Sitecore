@@ -1,3 +1,8 @@
+# Ercan Polat 
+# erjan123@yahoo.com
+# LinkedIn: https://www.linkedin.com/in/ercan-polat/
+# 07/26/2019
+#################################################################################################
 <#
 .SYNOPSIS
     Uninstalls Solr on your machine. 
@@ -15,8 +20,8 @@
 #>
 
 param(
-    [string]$solrExtractLocation = "C:\solr\solr-7.2.1", 
-    [string]$solrServiceName="solr-7.2.1")
+    [string]$solrExtractLocation = "C:\solr\solr-7.5.0", 
+    [string]$solrServiceName="solr-7.5.0")
 
 $nssmName="nssm.exe"
 $nssmLocalPath=".\$nssmName"

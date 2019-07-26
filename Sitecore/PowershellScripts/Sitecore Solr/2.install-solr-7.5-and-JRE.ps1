@@ -1,16 +1,17 @@
 # Ercan Polat 
 # erjan123@yahoo.com
 # LinkedIn: https://www.linkedin.com/in/ercan-polat/
+# 07/26/2019
 #################################################################################################
 # Enhanced PowerShell script that will download and install latest version of JRE
 
 # Solr Installation starts. 
 # Make sure to update the versions and folder path
 Param(
-    $solrVersion = "7.2.1",
+    $solrVersion = "7.5.0",
     $installFolder = "C:\solr",
     $solrPort = "8983",
-    $solrHost = "solr721",
+    $solrHost = "solr750",
     $solrSSL = $true,
     $nssmVersion = "2.24",
 	$downloadInstallJRE = $true,
