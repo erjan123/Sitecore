@@ -2,6 +2,7 @@
 # erjan123@yahoo.com
 # LinkedIn: https://www.linkedin.com/in/ercan-polat/
 # 07/26/2019
+# Version: 1.0
 #################################################################################################
 # Enhanced PowerShell script that will download and install latest version of JRE
 
@@ -31,25 +32,33 @@ if($downloadInstallJRE -eq $true)
 {
 	if($JREVersion64 -eq $true)
 	{
-		$URL=(Invoke-WebRequest -UseBasicParsing https://www.java.com/en/download/manual.jsp).Content | 	ForEach-Object{[regex]::matches($_, '(?:<a title="Download Java software for Windows \(64-bit\)" href=")(.*)(?:">)').Groups[1].Value}
-		$JREVersion = Get-ChildItem -Path "C:\Program Files\Java" -name | Where-Object { -not $_.PsIsContainer } | Sort-Object LastWriteTime -Descending | Select-Object -first 1
-		
-		Write-Host "$JREVersion"
-		$JREPath = "C:\Program Files\Java\$JREVersion"
-		Write-Host 	$JREPath
-		Write-Host "Downloading 64 bit of JRE"
+		$URL=(Invoke-WebRequest -UseBasicParsing https://www.java.com/en/download/manual.jsp).Content | 	ForEach-Object{[regex]::matches($_, '(?:<a title="Download Java software for Windows \(64-bit\)" href=")(.*)(?:">)').Groups[1].Value} 
 	}
 	else
 	{		
 		$URL=(Invoke-WebRequest -UseBasicParsing https://www.java.com/en/download/manual.jsp).Content | ForEach-Object{[regex]::matches($_, '(?:<a title="Download Java software for Windows Online" href=")(.*)(?:">)').Groups[1].Value}
-		$JREVersion = Get-ChildItem -Path "C:\Program Files (x86)\Java" -name | Where-Object { -not $_.PsIsContainer } | Sort-Object LastWriteTime -Descending | Select-Object -first 1
-
-		$JREPath = "C:\Program Files (x86)\Java\$JREVersion"
-
-		Write-Host "Downloading 32 bit of JRE"
 	}
 		Invoke-WebRequest -UseBasicParsing -OutFile jre8.exe $URL
 		Start-Process .\jre8.exe '/s REBOOT=0 SPONSORS=0 AUTO_UPDATE=0' -wait
+		
+	if($JREVersion64 -eq $true)
+	{
+		$JREVersion = Get-ChildItem -Path "C:\Program Files\Java" -name | Where-Object { -not $_.PsIsContainer } | Sort-Object LastWriteTime -Descending | Select-Object -first 1 
+		
+		Write-Host "JREVersion: $JREVersion"
+		$JREPath = "C:\Program Files\Java\$JREVersion"
+		Write-Host 	"JREPath" + $JREPath
+		Write-Host "Downloading 64 bit of JRE"
+	}	
+	else{
+
+		$JREVersion = Get-ChildItem -Path "C:\Program Files (x86)\Java" -name | Where-Object { -not $_.PsIsContainer } | Sort-Object LastWriteTime -Descending | Select-Object -first 1 
+
+		Write-Host "JREVersion: $JREVersion"
+		$JREPath = "C:\Program Files (x86)\Java\$JREVersion"
+		Write-Host 	"JREPath " + $JREPath
+		Write-Host "Downloading 32 bit of JRE"
+	}
 
 		Write-Host "JRE package URL " $URL
 }
@@ -209,4 +218,4 @@ Write-Host ""
 Write-Host "Verify Solr Admin page!"
 Write-Host ""
 Write-Host ""
-Write-Host "If you want to be happy then be happy!" -ForegroundColor Green
+Write-Host "If you want to be happy, then be happy!" -ForegroundColor Green
